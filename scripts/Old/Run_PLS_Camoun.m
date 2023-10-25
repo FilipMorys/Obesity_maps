@@ -5,22 +5,22 @@
 workdir='';
 addpath(genpath('/dagher/dagher11/filip/Obesity_maps/scripts/'));
 addpath(genpath('/dagher/dagher11/filip/Obesity_maps/data/'));
-BMI='HCPA_CT_DKT_LH';
-expr='DKT_aba_LH';
+BMI='BMI_DBM_LH_Cammoun';
+expr='Cammoun_aba_LH';
 
 %% Read coord_data
 
-load('DKT_coords_LH.mat');
-coords=DKT_coords_LH(:,5:7);
+load('~/Downloads/coords125.mat');
+coords=coords125(116:234,:);
 
 %% Run normal PLS
 
 bootnum=20000;
 
-PLS_bootstrap_DKT(expr, BMI, 5, bootnum, workdir)
+PLS_bootstrap(expr, BMI, 5, bootnum, workdir);
 
 nperm=10000;
 
-PLS_summary_component_stats_DKT(expr, BMI, 5, nperm, 'spatial', workdir, coords)
+PLS_summary_component_stats(expr, BMI, 5, nperm, 'spatial', workdir, coords)
 
 

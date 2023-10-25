@@ -25,7 +25,7 @@ opts = setvaropts(opts, "Gene", "WhitespaceRule", "preserve");
 opts = setvaropts(opts, "Gene", "EmptyFieldRule", "auto");
 
 % Import the data
-PLS1geneWeightsBMIDBMLH = readtable("/dagher/dagher11/filip/Obesity_maps/HCPA/PLS1_geneWeights_HCPA_CT_DKT_LH.csv", opts);
+PLS1geneWeightsBMIDBMLH = readtable("/dagher/dagher11/filip/Obesity_maps/UKBB/PLS2_geneWeights_11regions_UKBB_CT_DKT_LH.csv", opts);
 
 
 %% Clear temporary variables
@@ -38,7 +38,7 @@ genes_pos.Var1 = convertStringsToChars(genes_pos.Var1);
 
 %% Save as csv
 
-writetable(genes_pos, '/dagher/dagher11/filip/Obesity_maps/HCPA/Sig_genes_PLS1_BMI_positive.txt')
+writetable(genes_pos, '/dagher/dagher11/filip/Obesity_maps/UKBB/Sig_genes_PLS2_positive11.txt')
 
 %% Take only sig genes
 
@@ -47,4 +47,4 @@ genes_neg.Var1 = convertStringsToChars(genes_neg.Var1);
 
 %% Save as csv
 
-writetable(genes_neg, '/dagher/dagher11/filip/Obesity_maps/HCPA/Sig_genes_PLS1_BMI_negative.txt')
+writetable(genes_neg, '/dagher/dagher11/filip/Obesity_maps/UKBB/Sig_genes_PLS2_negative11.txt')

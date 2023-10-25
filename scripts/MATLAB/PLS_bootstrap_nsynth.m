@@ -105,17 +105,19 @@ disp('correlation of PLS components with MRI data:');
 %% Plot brain values against term scores
 fig=figure('MenuBar','none','Position', [10 10 900 600]);
 mdl = fitlm(XS(:,1),Y);
-plot(mdl, 'color', 'k','MarkerSize',12, 'LineWidth',1)
-%fig.WindowState = 'fullscreen';
+x=plot(mdl,'Marker','.','color','#048ba8','MarkerSize',12,'LineWidth',1,'MarkerSize',35);
+%fig.WindowState = 'fullscreen'
 title('')
 legend('off')
 xlabel('Term scores') 
 ylabel('BMI*CT') 
 ax = gca(fig);
-ax.FontSize = 15; 
+ax.FontSize = 25; 
 ax.Box='off';
 xticks([min(xticks):0.1:max(xticks)])
-exportgraphics(gcf, 'Terms_corr_nsynth.tif','Resolution',300)
+ax.LineWidth=2;
+set(x(2:4),'Color','#f18f01','LineWidth',4);
+exportgraphics(gcf, 'Terms_nsynth_corr_new.tif','Resolution',300);
 
 
 

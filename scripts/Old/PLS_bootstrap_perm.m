@@ -1,4 +1,4 @@
-function PLS_bootstrap(GENEdata_root, MRIdata_root, ncomp, bootnum, working_dir)
+function [BR]=PLS_bootstrap_perm(GENEdata_root, MRIdata_root, ncomp, bootnum, working_dir)
 % PLS regression and boostrapping
 %% ------------------------- SCRIPT INFORMATION ---------------------------
 %
@@ -80,7 +80,11 @@ disp('>>> grouping + averaging MRI data')
 disp(' ')
 % calculate average QSM score in each region and convert to column vector
 %mean_MRIdata = (mean(QSMdata))';
-mean_MRIdata = QSMdata';
+mean_MRIdata = QSMdata;
+
+%% Permute MRI data randomly
+
+mean_MRIdata=QSMdata(randperm(length(QSMdata)));
 
 %% run initial PLS
 
@@ -116,23 +120,6 @@ for cc = 1:ncomp
     PLSinitID(:,cc)=GENEids(PLSinitIdx(:,cc));
     PLSgeneIndex(:,cc)=GENEindex(PLSinitIdx(:,cc));
 end
-
-%% Plot brain values against term scores
-fig=figure('MenuBar','none','Position', [10 10 1500 600]);
-mdl = fitlm(XS(:,1),Y);
-x=plot(mdl,'Marker','.','color','#048ba8','MarkerSize',12,'LineWidth',1,'MarkerSize',35);
-%fig.WindowState = 'fullscreen'
-title('')
-legend('off')
-xlabel('Gene scores') 
-ylabel('BMI*CT') 
-ax = gca(fig);
-ax.FontSize = 25; 
-ax.Box='off';
-xticks([min(xticks):0.1:max(xticks)])
-ax.LineWidth=2;
-set(x(2:4),'Color','#f18f01','LineWidth',4);
-exportgraphics(gcf, 'Terms_corr_new.tif','Resolution',300);
 
 %% save ROI weights to .csv
 disp('>>> saving ROI weights')
@@ -186,29 +173,33 @@ PLSzW = zeros(length(GENEindex),ncomp);
 PLSzIdx = zeros(length(GENEindex),ncomp);
 PLSzID = cell(length(GENEindex),ncomp);
 
-disp('>>> saving bootstrapped gene weights') 
-% for all components
-for cc = 1:ncomp
+%disp('>>> saving bootstrapped gene weights') 
+% for 2nd component because this was sig in my analysis
+
+for cc = 2
     
     % get standard deviation of weights from bootstrap runs
     PLSstdW(:,cc)=std(PLSbootW(:,:,cc),0,2);
     
     % get bootstrap weights
-    temp=PLSinitW(:,cc)./PLSstdW(:,cc);
+    BR=PLSinitW(:,cc)./PLSstdW(:,cc);
     
     % order bootstrap weights (Z) and names of genes
-    [PLSzW(:,cc), PLSzIdx(:,cc)]=sort(temp,'descend');
+    [PLSzW(:,cc), PLSzIdx(:,cc)]=sort(BR,'descend');
     PLSzID(:,cc)=PLSinitID(PLSzIdx(:,cc));
     PLSgeneIndex(:,cc)=PLSgeneIndex(PLSzIdx(:,cc));
-    
-    % save results to .csv
-    fname = [sprintf('PLS%01d_geneWeights_',cc) MRIdata_root '.csv'];
-    fid = fopen(fullfile(working_dir,fname),'w');
-    for ii=1:length(GENEids)
-        fprintf(fid,'%s, %d, %f\n',...
-            PLSzID{ii,cc}, PLSgeneIndex(ii,cc), PLSzW(ii,cc));
-    end
-    fclose(fid);
+%     
+%     % save results to .csv
+%     fname = [sprintf('PLS%01d_geneWeights_',cc) MRIdata_root '.csv'];
+%     fid = fopen(fullfile(working_dir,fname),'w');
+%     for ii=1:length(GENEids)
+%         fprintf(fid,'%s, %d, %f\n',...
+%             PLSzID{ii,cc}, PLSgeneIndex(ii,cc), PLSzW(ii,cc));
+%     end
+%     fclose(fid);
+
+    BR=sortrows(table(string(PLSzID(:,cc)),PLSzW(:,cc)));
+ 
 end
 disp(' ')
 disp('Done!')

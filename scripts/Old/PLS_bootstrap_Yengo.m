@@ -69,9 +69,9 @@ GENEdata = importdata([GENEdata_root '.mat']);
 %        mean(GENEdata(~isnan(GENEdata(:,g)),g));
 %end
 
-load('abagenes.mat');
+load('Genes_Yengo_names.mat');
 GENEindex=(1:length(GENEdata))';
-GENEids = abagenes;
+GENEids = genesYengoLH;
 
 % import matrix of Nsubjects*NROI MRI data
 QSMdata  = importdata([MRIdata_root '.mat']);
@@ -80,7 +80,7 @@ disp('>>> grouping + averaging MRI data')
 disp(' ')
 % calculate average QSM score in each region and convert to column vector
 %mean_MRIdata = (mean(QSMdata))';
-mean_MRIdata = QSMdata';
+mean_MRIdata = QSMdata;
 
 %% run initial PLS
 
@@ -118,21 +118,10 @@ for cc = 1:ncomp
 end
 
 %% Plot brain values against term scores
-fig=figure('MenuBar','none','Position', [10 10 1500 600]);
-mdl = fitlm(XS(:,1),Y);
-x=plot(mdl,'Marker','.','color','#048ba8','MarkerSize',12,'LineWidth',1,'MarkerSize',35);
-%fig.WindowState = 'fullscreen'
-title('')
-legend('off')
-xlabel('Gene scores') 
-ylabel('BMI*CT') 
-ax = gca(fig);
-ax.FontSize = 25; 
-ax.Box='off';
-xticks([min(xticks):0.1:max(xticks)])
-ax.LineWidth=2;
-set(x(2:4),'Color','#f18f01','LineWidth',4);
-exportgraphics(gcf, 'Terms_corr_new.tif','Resolution',300);
+figure()
+mdl = fitlm(XS(:,2),Y);
+plot(mdl)
+exportgraphics(gcf, 'DBM_terms_corr.tif','Resolution',300)
 
 %% save ROI weights to .csv
 disp('>>> saving ROI weights')

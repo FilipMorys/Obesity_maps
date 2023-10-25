@@ -5,15 +5,13 @@
 workdir='';
 addpath(genpath('/dagher/dagher11/filip/Obesity_maps/scripts/'));
 addpath(genpath('/dagher/dagher11/filip/Obesity_maps/data/'));
-addpath(genpath('/dagher/dagher11/filip/Obesity_maps/data_old/'));
-
-BMI='UKBB_CT_DKT_LHRH';
-nsynth='Nsynth_DKT_thickness_LHRH';
+BMI='BMI_DBM_Cammoun_LHRH';
+nsynth='Nsynth_Cammoun_LHRH';
 
 %% Read coord_data
 
-load('DKT_coords_LHRH.mat');
-coords=DKT_coords(:,5:7);
+load('~/Downloads/coords125.mat');
+coords=coords125(1:234,:);
 
 %% Run normal PLS
 
@@ -23,6 +21,6 @@ PLS_bootstrap_nsynth(nsynth, BMI, 5, bootnum, workdir);
 
 nperm=10000;
 
-PLS_summary_component_stats_nsynth_thickness(nsynth, BMI, 5, nperm, 'spatial', workdir, coords)
+PLS_summary_component_stats_nsynth(nsynth, BMI, 5, nperm, 'spatial', workdir, coords)
 
 

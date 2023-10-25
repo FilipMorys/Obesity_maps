@@ -62,6 +62,7 @@ addpath(working_dir);
 % load NROI*Ngenes gene expression matrix (LH only) as well as probeInfo
 %load();
 GENEdata = importdata([GENEdata_root '.mat']);
+%GENEdata = GENEdata([30,25,29,7,22,24,10,20,28,19,16],:); % only for HCPA and UKBB
 %GENEdata(:,1) = [];
 % replace NaN gene*ROI entries with mean expression in that ROI
 %for g = 1:size(GENEdata,2)
@@ -69,25 +70,25 @@ GENEdata = importdata([GENEdata_root '.mat']);
 %        mean(GENEdata(~isnan(GENEdata(:,g)),g));
 %end
 
-load('abagenes.mat');
-GENEindex=(1:length(GENEdata))';
-GENEids = abagenes;
+load('brainspangenes.mat'); % ababrainspangenes.mat for HCP and ABCD, abagenes_limited_names.mat for HCAP and UKBB
+GENEindex=(1:length(GENEdata));
+GENEids = brainspangenes; % ababrainspangenes for ABCD and HCP, abagenes_limited_names for UKBB and HCPA
 
 % import matrix of Nsubjects*NROI MRI data
 QSMdata  = importdata([MRIdata_root '.mat']);
+QSMdata = QSMdata(:,[30,25,29,7,22,24,10,20,28,19,16])';
 
 disp('>>> grouping + averaging MRI data')
 disp(' ')
 % calculate average QSM score in each region and convert to column vector
 %mean_MRIdata = (mean(QSMdata))';
-mean_MRIdata = QSMdata';
+mean_MRIdata = QSMdata;
 
 %% run initial PLS
 
 % DO PLS in ncomp dimensions
-X=GENEdata;
 Y=mean_MRIdata;
-X=zscore(GENEdata,0,1);
+X=zscore(GENEdata,0,1)';
 Y=zscore(Y);
 disp(['>>> running initial PLS in ' num2str(ncomp) ' dimensions'])
 [~,~,XS,~,~,PCTVAR,~,stats]=plsregress(X,Y,ncomp);
@@ -118,26 +119,24 @@ for cc = 1:ncomp
 end
 
 %% Plot brain values against term scores
-fig=figure('MenuBar','none','Position', [10 10 1500 600]);
+fig=figure('MenuBar','none','Position', [10 10 900 600]);
 mdl = fitlm(XS(:,1),Y);
-x=plot(mdl,'Marker','.','color','#048ba8','MarkerSize',12,'LineWidth',1,'MarkerSize',35);
-%fig.WindowState = 'fullscreen'
+plot(mdl, 'color', 'k','MarkerSize',12, 'LineWidth',1)
+%fig.WindowState = 'fullscreen';
 title('')
 legend('off')
 xlabel('Gene scores') 
 ylabel('BMI*CT') 
 ax = gca(fig);
-ax.FontSize = 25; 
+ax.FontSize = 15; 
 ax.Box='off';
 xticks([min(xticks):0.1:max(xticks)])
-ax.LineWidth=2;
-set(x(2:4),'Color','#f18f01','LineWidth',4);
-exportgraphics(gcf, 'Terms_corr_new.tif','Resolution',300);
+exportgraphics(gcf, 'Terms_corr.tif','Resolution',300)
 
 %% save ROI weights to .csv
 disp('>>> saving ROI weights')
 for cc = 1:ncomp
-    fname = [sprintf('PLS%01d_ROIscores_',cc) MRIdata_root '.csv'];
+    fname = [sprintf('PLS%01d_ROIscores_11regions_',cc) MRIdata_root '.csv'];
     csvwrite(fullfile(working_dir,fname),XS(:,cc));
 end
 disp(' ')
@@ -202,7 +201,7 @@ for cc = 1:ncomp
     PLSgeneIndex(:,cc)=PLSgeneIndex(PLSzIdx(:,cc));
     
     % save results to .csv
-    fname = [sprintf('PLS%01d_geneWeights_',cc) MRIdata_root '.csv'];
+    fname = [sprintf('PLS%01d_geneWeights_11regions_',cc) MRIdata_root '.csv'];
     fid = fopen(fullfile(working_dir,fname),'w');
     for ii=1:length(GENEids)
         fprintf(fid,'%s, %d, %f\n',...
